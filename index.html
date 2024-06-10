@@ -1,58 +1,85 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | Offline Password Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        text-align: center;
-        overflow: hidden; /* Prevent scrolling */
-      }
-      #unity-canvas {
-        width: 100%;
-        height: 100%;
-        background: #231F20;
-      }
+        body {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            overflow: hidden; /* Prevent scrolling */
+            background-color: white; /* Set background color to white */
+        }
+        #unity-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        #unity-canvas {
+            background: #231F20;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
-  </head>
-  <body>
-    <canvas id="unity-canvas"></canvas>
+</head>
+<body>
+    <div id="unity-container">
+        <canvas id="unity-canvas"></canvas>
+    </div>
     <script src="Build/WebGL.loader.js"></script>
     <script>
-      function adjustCanvasSize() {
-        var canvas = document.getElementById('unity-canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
+        function adjustCanvasSize() {
+            var canvas = document.getElementById('unity-canvas');
+            var container = document.getElementById('unity-container');
+            var containerWidth = window.innerWidth;
+            var containerHeight = window.innerHeight;
+            var targetAspectRatio = 9 / 16;
+            var newWidth, newHeight;
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Adjust canvas size for mobile devices
-        window.addEventListener('resize', adjustCanvasSize);
-        adjustCanvasSize();
-      }
+            if (containerWidth / containerHeight > targetAspectRatio) {
+                newWidth = containerHeight * targetAspectRatio;
+                newHeight = containerHeight;
+            } else {
+                newWidth = containerWidth;
+                newHeight = containerWidth / targetAspectRatio;
+            }
 
-      createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/WebGL.data",
-        frameworkUrl: "Build/WebGL.framework.js",
-        codeUrl: "Build/WebGL.wasm",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "Offline Password Manager",
-        productVersion: "1.0",
-        // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
-        // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
-      }).then((unityInstance) => {
-        window.addEventListener('resize', () => {
-          unityInstance.SendMessage('GameObjectName', 'MethodName', 'Message');
+            canvas.style.width = newWidth + 'px';
+            canvas.style.height = newHeight + 'px';
+        }
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Adjust canvas size for mobile devices
+            window.addEventListener('resize', adjustCanvasSize);
+            adjustCanvasSize();
+        } else {
+            window.addEventListener('resize', adjustCanvasSize);
+            adjustCanvasSize();
+        }
+
+        createUnityInstance(document.querySelector("#unity-canvas"), {
+            dataUrl: "Build/WebGL.data",
+            frameworkUrl: "Build/WebGL.framework.js",
+            codeUrl: "Build/WebGL.wasm",
+            streamingAssetsUrl: "StreamingAssets",
+            companyName: "DefaultCompany",
+            productName: "Offline Password Manager",
+            productVersion: "1.0",
+            // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+            // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+        }).then((unityInstance) => {
+            window.addEventListener('resize', () => {
+                unityInstance.SendMessage('GameObjectName', 'MethodName', 'Message');
+            });
+        }).catch((message) => {
+            alert(message);
         });
-      }).catch((message) => {
-        alert(message);
-      });
     </script>
-	v2024.06.10
-  </body>
+    v2024.06.10
+</body>
 </html>
